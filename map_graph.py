@@ -16,7 +16,26 @@ query_type_mapping = {
     "Fortify": 7
 }
 
-def form_graph(graph, nodes, query_type):
+#card ids range from 0 - 43 (one for each territory and 2 wildcards)
+"""
+class CardModel(BaseModel):
+    card_id: int
+    territory_id: Optional[int]
+    symbol: Union[Literal["Infantry"], Literal["Cavalry"], Literal["Artillery"], Literal["Wildcard"]]
+"""
+
+def convert_card_sets_to_matrix(card_sets, max_card_id=43):
+    # Initialize a zero matrix
+    card_matrix = np.zeros((len(card_sets), max_card_id))
+
+    # Mark the presence of card IDs
+    for i, card_set in enumerate(card_sets):
+        for card_id in card_set:
+            card_matrix[i, card_id] = 1  # Assuming card_id starts from 0
+
+    return card_matrix
+
+def form_state(graph, nodes, cards, query_type):
     for node in nodes:
         graph.add_node(node, weight=nodes[node]['weight'], owner=nodes[node]['owner'])
     for node in nodes:
@@ -36,6 +55,12 @@ def form_graph(graph, nodes, query_type):
     # Stack the adjacency matrix and the ownership matrix along the third dimension
     feature_matrix = np.dstack((adjacency_matrix, ownership_matrix))
 
+    #Create a matrix of card sets
+    cards_matrix = convert_card_sets_to_matrix(cards)
+
+    # Add the card matrix as a new layer in the feature matrix
+    feature_matrix = np.dstack((feature_matrix, cards_matrix))
+
     # Create a one-hot encoding for the query type
     query_type_vector = np.zeros(len(query_type_mapping))
     query_type_vector[query_type_mapping[query_type]] = 1
@@ -46,7 +71,7 @@ def form_graph(graph, nodes, query_type):
     # Convert the feature matrix to a tensor
     feature_tensor = torch.tensor(feature_matrix, dtype=torch.float32)
 
-def update_graph(graph, nodes, query_type):
+def update_state(graph, nodes, cards, query_type):
     for node in nodes:
         graph.nodes[node]['weight'] = nodes[node]['weight']
         graph.nodes[node]['owner'] = nodes[node]['owner']
@@ -63,6 +88,12 @@ def update_graph(graph, nodes, query_type):
 
     # Stack the adjacency matrix and the ownership matrix along the third dimension
     feature_matrix = np.dstack((adjacency_matrix, ownership_matrix))
+
+    #Create a matrix of card sets
+    cards_matrix = convert_card_sets_to_matrix(cards)
+
+    # Add the card matrix as a new layer in the feature matrix
+    feature_matrix = np.dstack((feature_matrix, cards_matrix))
 
     # Create a one-hot encoding for the query type
     query_type_vector = np.zeros(len(query_type_mapping))

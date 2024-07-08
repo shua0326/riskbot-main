@@ -135,12 +135,12 @@ def handle_redeem_cards(game: Game, bot_state: BotState, query: QueryRedeemCards
     cards_remaining = game.state.me.cards.copy()
 
     while len(cards_remaining) >= 5:
-        card_set = game.state.get_card_set(cards_remaining)
+        card_set = game.state.get_card_set(cards_remaining) #finds a card sets that can be redeemed
         # According to the pigeonhole principle, we should always be able to make a set
         # of cards if we have at least 5 cards.
         assert card_set != None
         card_sets.append(card_set)
-        cards_remaining = [card for card in cards_remaining if card not in card_set]
+        cards_remaining = [card for card in cards_remaining if card not in card_set]    #removes the redeemed cards from the list of cards
 
     # Remember we can't redeem any more than the required number of card sets if 
     # we have just eliminated a player.
