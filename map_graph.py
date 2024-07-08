@@ -16,6 +16,8 @@ query_type_mapping = {
     "Fortify": 7
 }
 
+card_symbol_mapping = {"Infantry": 0, "Cavalry": 1, "Artillery": 2, "Wildcard": 3}
+
 #card ids range from 0 - 43 (one for each territory and 2 wildcards)
 """
 class CardModel(BaseModel):
@@ -25,13 +27,16 @@ class CardModel(BaseModel):
 """
 
 def convert_card_sets_to_matrix(card_sets, max_card_id=43):
-    # Initialize a zero matrix
-    card_matrix = np.zeros((len(card_sets), max_card_id))
+    num_symbols = 4  # Number of different symbols
+    # Initialize a zero matrix with an additional dimension for symbols
+    card_matrix = np.zeros((len(card_sets), max_card_id, num_symbols))
 
-    # Mark the presence of card IDs
     for i, card_set in enumerate(card_sets):
-        for card_id in card_set:
-            card_matrix[i, card_id] = 1  # Assuming card_id starts from 0
+        for card in card_set:
+            card_id = card.card_id
+            symbol_index = card_symbol_mapping[card.symbol]
+            # Mark the presence of card ID and symbol using one-hot encoding
+            card_matrix[i, card_id, symbol_index] = 1
 
     return card_matrix
 
