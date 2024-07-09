@@ -80,7 +80,7 @@ class ActionSpace:
                 actions_tensor = actions_tensor.unsqueeze(0).float()
 
                 return actions_tensor
-            
+
             case "RedeemCards":
                 return self.redeem_cards()
             case "DistributeTroops":
