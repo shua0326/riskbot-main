@@ -122,6 +122,9 @@ class ActionSpace:
                 actions_tensor = torch.tensor(actions).int()
                 return actions_tensor
 
+        def create_action_mask():
+            pass
+
         """from_territory = np.random.choice(len(self.my_territories))
         to_territory = np.random.choice(len(self.adjacent_territories))
         num_troops = np.random.randint(1, self.max_troops + 1)

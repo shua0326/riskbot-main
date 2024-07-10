@@ -5,19 +5,40 @@ import torch.optim as optim
 #this method might be the best way to determine the action
 #seperate each action into a different dqn model
 
-"""
+# Define the DQN
+class DQN(nn.Module):
+    def __init__(self, state_space_dim, action_space_dim):
+        super(DQN, self).__init__()
+        self.fc1 = nn.Linear(state_space_dim, 128)
+        self.fc2 = nn.Linear(128, 128)
+        self.fc3 = nn.Linear(128, action_space_dim)
+
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        return self.fc3(x)
+
 # Initialize the DQN models for each query type
-state_space_dim = ...  # Size of the state space
-#the dimensions would be the parameters of the action space
+
+"""
+The dimensionality of the state vector will be:  
+Adjacency Matrix: ( 42 \times 42 = 1764 )
+Ownership Matrix: ( 42 \times 5 = 210 )
+Card Matrix: ( 1 \times 44 \times 4 = 176 )
+So, the state_space_dim will be ( 1764 + 210 + 176 = 2150 ).
+"""
+
+state_space_dim = 2150
+
 action_space_dims = {
-    "ClaimTerritory": ...,
-    "PlaceInitialTroop": ...,
-    "RedeemCards": ...,
-    "DistributeTroops": ...,
-    "Attack": ...,
-    "TroopsAfterAttack": ...,
-    "Defend": ...,
-    "Fortify": ...
+    "ClaimTerritory": 42,
+    "PlaceInitialTroop": 42,
+    "RedeemCards": 45,
+    "DistributeTroops": 42*50,      #50 is an arbitrary max troops number
+    "Attack": 42*42*3,
+    "TroopsAfterAttack": 20,        #20 is an arbitrary max troops number
+    "Defend": 2,
+    "Fortify": 42*42*20            #20 is an arbitrary max troops number
 }
 
 dqns = {query: DQN(state_space_dim, action_space_dim) for query, action_space_dim in action_space_dims.items()}
@@ -59,48 +80,6 @@ for episode in range(num_episodes):
         if done:
             break
         state = next_state
-"""
-
-# Define the DQN
-class DQN(nn.Module):
-    def __init__(self, state_space_dim, action_space_dim):
-        super(DQN, self).__init__()
-        self.fc1 = nn.Linear(state_space_dim, 128)
-        self.fc2 = nn.Linear(128, 128)
-        self.fc3 = nn.Linear(128, action_space_dim)
-
-    def forward(self, x):
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        return self.fc3(x)
-
-# Initialize the DQN
-state_space_dim = ...  # Size of the state space
-action_space_dim = ...  # Size of the action space
-dqn = DQN(state_space_dim, action_space_dim)
-optimizer = optim.Adam(dqn.parameters())
-loss_fn = nn.MSELoss()
-
-# Train the DQN
-for episode in range(num_episodes):
-    state = ...  # Get the initial state
-    for t in range(max_steps_per_episode):
-        action = ...  # Choose an action
-        next_state, reward, done = ...  # Take the action and get the new state, reward, and done flag
-
-        # Compute the target Q-value
-        target_q_value = reward + gamma * torch.max(dqn(next_state))
-
-        # Update the DQN
-        predicted_q_value = dqn(state)[action]
-        loss = loss_fn(predicted_q_value, target_q_value)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        if done:
-            break
-        state = next_state
 
 def dqn_learn(state, action, reward, next_state, done):
     # Convert states to tensor
@@ -128,15 +107,3 @@ def dqn_learn(state, action, reward, next_state, done):
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
-
-class DQN_Territory_Troops(nn.Module):
-    def __init__(self, state_space_dim, num_territories, max_troops):
-        super(DQN, self).__init__()
-        self.fc1 = nn.Linear(state_space_dim, 128)
-        self.fc2 = nn.Linear(128, 128)
-        self.fc3 = nn.Linear(128, num_territories * max_troops)  # Output Q-values for each combination
-
-    def forward(self, x):
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        return self.fc3(x).view(-1, num_territories, max_troops)  # Reshape to (batch_size, num_territories, max_troops)

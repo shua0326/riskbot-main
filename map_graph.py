@@ -89,7 +89,7 @@ def convert_card_sets_to_matrix(card_sets, max_card_id=43):
 
     return card_matrix
 
-def form_state(graph, nodes, cards, query_type):
+def form_state(graph, nodes, cards):
     for node in nodes:
         graph.add_node(node.id, weight=node.troops, owner=node.occupier)
     for node in nodes:
@@ -115,17 +115,10 @@ def form_state(graph, nodes, cards, query_type):
     # Add the card matrix as a new layer in the feature matrix
     feature_matrix = np.dstack((feature_matrix, cards_matrix))
 
-    # Create a one-hot encoding for the query type
-    query_type_vector = np.zeros(len(query_type_mapping))
-    query_type_vector[query_type_mapping[query_type]] = 1
-
-    # Add the query type vector as a new layer in the feature matrix
-    feature_matrix = np.dstack((feature_matrix, query_type_vector))
-
     # Convert the feature matrix to a tensor
     feature_tensor = torch.tensor(feature_matrix, dtype=torch.float32)
 
-def update_state(graph, nodes, cards, query_type):
+def update_state(graph, nodes, cards):
     for node in nodes:
         graph.nodes[node.id]['weight'] = node.troops
         graph.nodes[node.id]['owner'] = node.occupier
@@ -149,13 +142,35 @@ def update_state(graph, nodes, cards, query_type):
     # Add the card matrix as a new layer in the feature matrix
     feature_matrix = np.dstack((feature_matrix, cards_matrix))
 
-    # Create a one-hot encoding for the query type
-    query_type_vector = np.zeros(len(query_type_mapping))
-    query_type_vector[query_type_mapping[query_type]] = 1
-
-    # Add the query type vector as a new layer in the feature matrix
-    feature_matrix = np.dstack((feature_matrix, query_type_vector))
-
     # Convert the feature matrix to a tensor
     feature_tensor = torch.tensor(feature_matrix, dtype=torch.float32)
 
+"""
+def form_state(graph, nodes, cards):
+    # Add nodes and edges to the graph
+    for node in nodes:
+        graph.add_node(node.id, weight=node.troops, owner=node.occupier)
+    for node in nodes:
+        for neighbor in game.state.map.get_adjacent_to(node):
+            graph.add_edge(node, neighbor)
+
+    # Create an adjacency matrix with node features
+    adjacency_matrix = nx.adjacency_matrix(graph).todense()
+    np.fill_diagonal(adjacency_matrix, [data['weight'] for node, data in graph.nodes(data=True)])
+
+    # Create an ownership matrix
+    num_players = 5
+    ownership_matrix = np.zeros((len(graph.nodes), num_players))
+    for i, (node, data) in enumerate(graph.nodes(data=True)):
+        ownership_matrix[i, data['owner']] = 1
+
+    # Create a matrix for card information
+    cards_matrix = convert_card_sets_to_matrix(cards)
+
+    # Stack the adjacency matrix, ownership matrix, and card matrix along the third dimension
+    feature_matrix = np.dstack((adjacency_matrix, ownership_matrix, cards_matrix))
+
+    # Convert the feature matrix to a tensor
+    feature_tensor = torch.tensor(feature_matrix, dtype=torch.float32)
+    return feature_tensor
+"""
