@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.optim as
+import torch.optim as optim
 
 #this method might be the best way to determine the action
 #seperate each action into a different dqn model
@@ -128,3 +128,15 @@ def dqn_learn(state, action, reward, next_state, done):
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
+
+class DQN_Territory_Troops(nn.Module):
+    def __init__(self, state_space_dim, num_territories, max_troops):
+        super(DQN, self).__init__()
+        self.fc1 = nn.Linear(state_space_dim, 128)
+        self.fc2 = nn.Linear(128, 128)
+        self.fc3 = nn.Linear(128, num_territories * max_troops)  # Output Q-values for each combination
+
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        return self.fc3(x).view(-1, num_territories, max_troops)  # Reshape to (batch_size, num_territories, max_troops)
