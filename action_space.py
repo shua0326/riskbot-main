@@ -141,7 +141,7 @@ class ActionSpace:
 
                     mask = torch.zeros(q_values.shape, dtype=torch.float32)
                     for territory in available:
-                        mask[0, territory] = 1
+                        mask[0, territory.id] = 1
 
                     masked_q_values = q_values * mask + (1 - mask) * float('-inf')
                     return masked_q_values

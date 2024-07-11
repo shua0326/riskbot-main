@@ -5,6 +5,47 @@ import torch.optim as optim
 #this method might be the best way to determine the action
 #seperate each action into a different dqn model
 
+class riskbot():
+    def __init__(self, territories, troops):
+        self.territories = territories
+        self.troops = troops
+
+    def calc_reward(self, query):
+        match query:
+            case "ClaimTerritory":
+                num_territories = len(game.state.get_territories_owned_by(game.state.me.player_id))
+
+                if num_territories > self.territories:
+                    self.territories = num_territories
+                    return 1
+                elif num_territories == self.territories:
+                    self.territories = num_territories
+                    return 0
+                else:
+                    self.territories = num_territories
+                    return -1
+
+            case "PlaceInitialTroop":
+                #need to decide how to determine the reward for this
+
+            case "RedeemCards":
+                #need to decide how to determine the reward for this
+
+            case "DistributeTroops":
+                #need to decide how to determine the reward for this
+
+            case "Attack":
+                #need to decide how to determine the reward for this
+
+            case "TroopsAfterAttack":
+                #need to decide how to determine the reward for this
+
+            case "Defend":
+                #need to decide how to determine the reward for this
+
+            case "Fortify":
+                #need to decide how to determine the reward for this
+
 # Define the DQN
 class DQN(nn.Module):
     def __init__(self, state_space_dim, action_space_dim):
@@ -33,7 +74,7 @@ state_space_dim = 2150
 action_space_dims = {
     "ClaimTerritory": 42,
     "PlaceInitialTroop": 42,
-    "RedeemCards": 45,
+    "RedeemCards": 5601,
     "DistributeTroops": 42*50,      #50 is an arbitrary max troops number
     "Attack": 42*42*3,
     "TroopsAfterAttack": 20,        #20 is an arbitrary max troops number
@@ -47,12 +88,13 @@ loss_fn = nn.MSELoss()
 
 # Training loop for each DQN model
 for episode in range(num_episodes):
-    state = ...  # Get the initial state
-    query = ...  # Determine the current query type
-    dqn = dqns[query]
-    optimizer = optimizers[query]
 
     for t in range(max_steps_per_episode):
+        state = ...
+        query = ...
+        dqn = dqns[query]
+        optimizer = optimizers[query]
+
         state_tensor = torch.FloatTensor(state).unsqueeze(0)
         action_mask = ...  # Generate the action mask based on the current state
 
@@ -60,6 +102,7 @@ for episode in range(num_episodes):
         q_values = dqn(state_tensor)
         masked_q_values = q_values * action_mask
         action = torch.argmax(masked_q_values).item()
+
 
         next_state, reward, done = ...  # Take the action and get the new state, reward, and done flag
 
