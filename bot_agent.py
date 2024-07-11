@@ -10,6 +10,7 @@ class riskbot():
         self.territories = territories
         self.troops = troops
 
+    #potentially give a big reward to all dqn models when the game is won
     def calc_reward(self, query):
         match query:
             case "ClaimTerritory":
