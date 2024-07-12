@@ -32,7 +32,7 @@ class BotState():
         self.enemy: Optional[int] = None
 
 
-def make_adjacency_matrix(map: Map):
+def make_adjacency_matrix(map: Map) -> list[int][int]:
     # initialize a 2D matrix populated with value 0
     num_vertices = 42
     adj_matrix = [[0 for _ in range(num_vertices)] for _ in range(num_vertices)]

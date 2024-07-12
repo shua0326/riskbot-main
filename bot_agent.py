@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+
 #this method might be the best way to determine the action
 #seperate each action into a different dqn model
 
@@ -48,12 +49,27 @@ loss_fn = nn.MSELoss()
 # Training loop for each DQN model
 for episode in range(num_episodes):
     state = ...  # Get the initial state
+    adj_matrix = ...
+    owner_list = ... 
+    owned_card = ...
     query = ...  # Determine the current query type
     dqn = dqns[query]
     optimizer = optimizers[query]
 
     for t in range(max_steps_per_episode):
-        state_tensor = torch.FloatTensor(state).unsqueeze(0)
+
+        # get the data and turn it into a tensor
+        adj_matrix_tensor = ...
+        owner_list_tensor = ...
+        owned_card_tensor = ...
+
+        # change the data type to match
+        owner_list_tensor = owner_list_tensor.to(dtype=adj_matrix_tensor.dtype)
+        owned_card_tensor = owned_card_tensor.to(dtype=adj_matrix_tensor.dtype)
+
+        # unsqueeze and concatenate
+        state_tensor = torch.cat((adj_matrix_tensor, owner_list_tensor.unsqueeze(1)), dim=1)
+        state_tensor = torch.cat((adj_matrix_tensor, owned_card_tensor.unsqueeze(1)), dim=1)
         action_mask = ...  # Generate the action mask based on the current state
 
         # Choose an action
