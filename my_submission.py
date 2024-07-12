@@ -32,6 +32,28 @@ class BotState():
         self.enemy: Optional[int] = None
 
 
+def make_adjacency_matrix(map: Map):
+    # initialize a 2D matrix populated with value 0
+    num_vertices = 42
+    adj_matrix = [[0 for _ in range(num_vertices)] for _ in range(num_vertices)]
+    for id in range(num_vertices):
+        for vertex in map._edges[id]:
+            adj_matrix[id][vertex] = 1
+    return adj_matrix
+
+def make_ownership_list(game: Game):
+    ownership_list = [None for _ in range(42)]
+    # Sort the territories by their keys
+    sorted_territories = sorted(game.state.territories.keys())
+    for territory_id in sorted_territories:
+        territory = game.state.territories[territory_id]
+        ownership_list[territory_id] = territory.occupier
+    return ownership_list
+        
+def make_card_matrix():
+    pass
+
+
 def main():
     
     # Get the game object, which will connect you to the engine and
